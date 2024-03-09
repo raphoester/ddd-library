@@ -15,8 +15,11 @@ import (
 func getUsersAuthController() *registration_controllers.UsersController {
 
 	wire.Build(
-		wire.NewSet(inmemory_users_storage.New,
+		wire.NewSet(
+
+			inmemory_users_storage.New,
 			registrations.NewUsersRegistrar,
+
 			wire.Bind(
 				new(driven.UsersStorage),
 				new(*inmemory_users_storage.Repository),

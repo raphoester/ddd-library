@@ -21,10 +21,12 @@ func New(usersRegistrar usecases.UsersRegistrar) *UsersController {
 func (c *UsersController) RegisterUser(ctx context.Context,
 	req *proto.RegisterUserRequest) (*proto.RegisterUserResponse, error) {
 
-	if err := c.usersRegistrar.RegisterUser(ctx, usecases.RegisterUserParams{
-		Email:    req.Email,
-		Password: req.Password,
-	}); err != nil {
+	if err := c.usersRegistrar.RegisterUser(
+		ctx, usecases.RegisterUserParams{
+			Email:    req.Email,
+			Password: req.Password,
+		},
+	); err != nil {
 		return nil, err
 	}
 

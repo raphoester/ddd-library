@@ -1,19 +1,30 @@
 package main
 
 import (
-	"context"
+	"net"
 
+	"github.com/raphoester/ddd-library/configs"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/proto"
+	"github.com/raphoester/ddd-library/internal/pkg/envconfig"
 )
 
 func main() {
+	var cfg configs.Config
+	if err := envconfig.Parse(&cfg); err != nil {
+		panic(err)
+	}
+
 	auth := getUsersAuthController()
 
-	_, err := auth.RegisterUser(context.Background(), &proto.RegisterUserRequest{
-		Email:    "raphaeloester@gmail.com",
-		Password: "12345678",
-	})
+	srv := getGRPCServer()
+	proto.RegisterAuthenticationServer(srv, auth)
+
+	listener, err := net.Listen("tcp", cfg.ServerConfig.BindAddress)
 	if err != nil {
+		panic(err)
+	}
+
+	if err := srv.Serve(listener); err != nil {
 		panic(err)
 	}
 }
