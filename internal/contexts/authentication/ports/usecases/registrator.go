@@ -2,11 +2,11 @@ package usecases
 
 import "context"
 
-type RegisterParams struct {
+type RegisterUserParams struct {
 	Email    string
 	Password string
 }
 
 type UsersRegistrar interface {
-	RegisterUser(ctx context.Context, params RegisterParams) error
+	RegisterUser(ctx context.Context, params RegisterUserParams) error
 }

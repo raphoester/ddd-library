@@ -8,14 +8,15 @@ package main
 
 import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/adapters/inmemory_users_storage"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/controllers/registration_controllers"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/registrations"
 )
 
-// Injectors from driver.go:
+// Injectors from wire.go:
 
-func getAuthUseCase() usecases.UsersRegistrar {
+func getUsersAuthController() *registration_controllers.UsersController {
 	repository := inmemory_users_storage.New()
 	usersRegistrar := registrations.NewUsersRegistrar(repository)
-	return usersRegistrar
+	usersController := registration_controllers.New(usersRegistrar)
+	return usersController
 }

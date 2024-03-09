@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package library;
+
+option go_package = "github.com/raphoester/internal/contexts/borrow/infrastructure/proto";
+
+import "google/protobuf/timestamp.proto";
+
+//service Authentication {
+//  rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse);
+//}
+//
+//message RegisterUserRequest {
+//  string email = 1;
+//  string password = 2;
+//}
+//
+//message RegisterUserResponse {}

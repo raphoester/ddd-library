@@ -3,16 +3,17 @@ package main
 import (
 	"context"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/proto"
 )
 
 func main() {
-	auth := getAuthUseCase()
+	auth := getUsersAuthController()
 
-	if err := auth.RegisterUser(context.Background(), usecases.RegisterParams{
+	_, err := auth.RegisterUser(context.Background(), &proto.RegisterUserRequest{
 		Email:    "raphaeloester@gmail.com",
-		Password: "123456789101112",
-	}); err != nil {
+		Password: "12345678",
+	})
+	if err != nil {
 		panic(err)
 	}
 }

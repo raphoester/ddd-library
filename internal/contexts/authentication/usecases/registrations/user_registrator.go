@@ -19,7 +19,7 @@ func NewUsersRegistrar(usersStorage driven.UsersStorage) *UsersRegistrar {
 	}
 }
 
-func (r *UsersRegistrar) RegisterUser(ctx context.Context, params usecases.RegisterParams) error {
+func (r *UsersRegistrar) RegisterUser(ctx context.Context, params usecases.RegisterUserParams) error {
 
 	emailAddress, err := auth_model.NewEmailAddress(params.Email)
 	if err != nil {

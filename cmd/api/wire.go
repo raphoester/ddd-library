@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/adapters/inmemory_users_storage"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/controllers/registration_controllers"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/driven"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/registrations"
@@ -11,7 +12,7 @@ import (
 	"github.com/google/wire"
 )
 
-func getAuthUseCase() usecases.UsersRegistrar {
+func getUsersAuthController() *registration_controllers.UsersController {
 
 	wire.Build(
 		wire.NewSet(inmemory_users_storage.New,
@@ -25,8 +26,10 @@ func getAuthUseCase() usecases.UsersRegistrar {
 				new(usecases.UsersRegistrar),
 				new(*registrations.UsersRegistrar),
 			),
+
+			registration_controllers.New,
 		),
 	)
 
-	return &registrations.UsersRegistrar{}
+	return &registration_controllers.UsersController{}
 }
