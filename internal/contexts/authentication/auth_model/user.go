@@ -54,6 +54,10 @@ func NewEmailAddress(value string) (EmailAddress, error) {
 	return EmailAddress(value), nil
 }
 
+func (e EmailAddress) String() string {
+	return string(e)
+}
+
 func (e EmailAddress) Validate() error {
 	_, err := NewEmailAddress(string(e))
 	return err
@@ -103,4 +107,12 @@ func (u *User) CheckPassword(pw string) (bool, error) {
 
 func (u *User) GetID() ID {
 	return u.id
+}
+
+func (u *User) HasEmailAddress(email EmailAddress) bool {
+	return u.emailAddress == email
+}
+
+func (u *User) GetEmailAddress() EmailAddress {
+	return u.emailAddress
 }

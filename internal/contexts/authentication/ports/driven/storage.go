@@ -8,6 +8,8 @@ import (
 
 type UsersStorage interface {
 	RegisterUser(ctx context.Context, user *auth_model.User) error
+	FindUserByID(ctx context.Context, id auth_model.ID) (*auth_model.User, error)
+	FindUserFromEmail(ctx context.Context, email auth_model.EmailAddress) (*auth_model.User, error)
 }
 
 type TokensStorage interface {
