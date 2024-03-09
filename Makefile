@@ -22,4 +22,4 @@ run: wire
 	@go run ${MAIN_PACKAGE}
 
 
-.PHONY: all wire build clean
+.PHONY: all wire build clean run
