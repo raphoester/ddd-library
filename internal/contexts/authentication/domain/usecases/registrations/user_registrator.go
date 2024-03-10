@@ -4,16 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/driven"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 )
 
 type UsersRegistrar struct {
-	usersStorage driven.UsersStorage
+	usersStorage users.Storage
 }
 
-func NewUsersRegistrar(usersStorage driven.UsersStorage) *UsersRegistrar {
+func NewUsersRegistrar(usersStorage users.Storage) *UsersRegistrar {
 	return &UsersRegistrar{
 		usersStorage: usersStorage,
 	}
@@ -21,13 +20,13 @@ func NewUsersRegistrar(usersStorage driven.UsersStorage) *UsersRegistrar {
 
 func (r *UsersRegistrar) RegisterUser(ctx context.Context, params usecases.RegisterUserParams) error {
 
-	createUserParams := auth_model.NewUserParams{
+	createUserParams := users.NewUserParams{
 		EmailAddress: params.Email,
 		Password:     params.Password,
-		Role:         auth_model.RoleUser,
+		Role:         users.RoleUser,
 	}
 
-	user, err := auth_model.NewUser(createUserParams)
+	user, err := users.NewUser(createUserParams)
 	if err != nil {
 		return fmt.Errorf("failed to create a new user: %w", err)
 	}

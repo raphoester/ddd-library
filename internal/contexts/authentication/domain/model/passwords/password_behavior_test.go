@@ -1,15 +1,14 @@
-package auth_model_test
+package passwords_test
 
 import (
 	"testing"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
-
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/passwords"
 	"github.com/stretchr/testify/require"
 )
 
 func TestPassword_CheckPassword(t *testing.T) {
-	p := auth_model.Password{}
+	p := passwords.Password{}
 
 	err := p.GenerateSalt(func() string {
 		return "sample-salt"

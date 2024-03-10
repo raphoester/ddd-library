@@ -5,21 +5,22 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/id"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
 )
 
 type Repository struct {
 	mu    sync.Mutex
-	users map[auth_model.ID]*auth_model.User
+	users map[id.ID]*users.User
 }
 
 func New() *Repository {
 	return &Repository{
-		users: make(map[auth_model.ID]*auth_model.User),
+		users: make(map[id.ID]*users.User),
 	}
 }
 
-func (r *Repository) RegisterUser(_ context.Context, user *auth_model.User) error {
+func (r *Repository) RegisterUser(_ context.Context, user *users.User) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	for _, existingUser := range r.users {
@@ -31,7 +32,7 @@ func (r *Repository) RegisterUser(_ context.Context, user *auth_model.User) erro
 	return nil
 }
 
-func (r *Repository) FindUserByID(_ context.Context, id auth_model.ID) (*auth_model.User, error) {
+func (r *Repository) FindUserByID(_ context.Context, id id.ID) (*users.User, error) {
 	r.mu.Lock()
 	user, ok := r.users[id]
 	r.mu.Unlock()
@@ -41,7 +42,7 @@ func (r *Repository) FindUserByID(_ context.Context, id auth_model.ID) (*auth_mo
 	return user, nil
 }
 
-func (r *Repository) FindUserFromEmail(_ context.Context, email auth_model.EmailAddress) (*auth_model.User, error) {
+func (r *Repository) FindUserFromEmail(_ context.Context, email users.EmailAddress) (*users.User, error) {
 	r.mu.Lock()
 	for _, user := range r.users {
 		if user.HasEmailAddress(email) {

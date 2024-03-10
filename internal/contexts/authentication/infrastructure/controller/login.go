@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/proto"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -29,7 +29,7 @@ func (c *Controller) Login(ctx context.Context, req *proto.LoginRequest) (*proto
 }
 
 func mapLoginParams(req *proto.LoginRequest) (*usecases.LoginParams, error) {
-	emailAddress, err := auth_model.NewEmailAddress(req.Email)
+	emailAddress, err := users.NewEmailAddress(req.Email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create email address: %w", err)
 	}

@@ -1,4 +1,4 @@
-package auth_model
+package passwords
 
 import (
 	"strings"

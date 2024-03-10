@@ -5,17 +5,18 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/passwords"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrations"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/registrations"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUsersRegistrar_RegisterUser(t *testing.T) {
-	testEmail, _ := auth_model.NewEmailAddress("test@example.com")
-	testPassword, _ := auth_model.NewPassword("password")
+	testEmail, _ := users.NewEmailAddress("test@example.com")
+	testPassword, _ := passwords.NewPassword("password")
 
 	cases := []struct {
 		name                  string
@@ -27,12 +28,12 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 		{
 			name: "user already exists with email",
 			setupFunc: func(usersStorage *inmemory_users_storage.Repository) {
-				password, err := auth_model.NewPassword("password")
+				password, err := passwords.NewPassword("password")
 				require.NoError(t, err)
 
-				user, err := auth_model.NewUser(
-					auth_model.NewUserParams{
-						Role:         auth_model.RoleUser,
+				user, err := users.NewUser(
+					users.NewUserParams{
+						Role:         users.RoleUser,
 						EmailAddress: testEmail,
 						Password:     *password,
 					},

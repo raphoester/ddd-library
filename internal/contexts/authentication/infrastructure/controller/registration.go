@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/passwords"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/proto"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
 )
 
 func (c *Controller) RegisterUser(ctx context.Context,
@@ -25,12 +26,12 @@ func (c *Controller) RegisterUser(ctx context.Context,
 }
 
 func mapRegisterUserParams(req *proto.RegisterUserRequest) (*usecases.RegisterUserParams, error) {
-	password, err := auth_model.NewPassword(req.Password)
+	password, err := passwords.NewPassword(req.Password)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create password: %w", err)
 	}
 
-	email, err := auth_model.NewEmailAddress(req.Email)
+	email, err := users.NewEmailAddress(req.Email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create email address: %w", err)
 	}

@@ -4,21 +4,21 @@ import (
 	"context"
 	"sync"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/tokens"
 )
 
 type Repository struct {
-	tokens map[auth_model.AccessToken]*auth_model.Token
+	tokens map[tokens.AccessToken]*tokens.Token
 	mu     sync.Mutex
 }
 
 func New() *Repository {
 	return &Repository{
-		tokens: make(map[auth_model.AccessToken]*auth_model.Token),
+		tokens: make(map[tokens.AccessToken]*tokens.Token),
 	}
 }
 
-func (r *Repository) SaveToken(_ context.Context, token *auth_model.Token) error {
+func (r *Repository) SaveToken(_ context.Context, token *tokens.Token) error {
 
 	r.mu.Lock()
 	r.tokens[token.GetAccessToken()] = token

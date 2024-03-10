@@ -1,4 +1,4 @@
-package auth_model
+package id
 
 import (
 	"errors"

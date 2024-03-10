@@ -3,15 +3,15 @@
 package main
 
 import (
+	"github.com/google/wire"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/tokens"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
+	usecases2 "github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/login"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrations"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_tokens_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/controller"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/driven"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/login"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/registrations"
-
-	"github.com/google/wire"
 )
 
 func getUsersAuthController() *controller.Controller {
@@ -26,23 +26,23 @@ func getUsersAuthController() *controller.Controller {
 
 			// repositories
 			wire.Bind(
-				new(driven.TokensStorage),
+				new(tokens.Storage),
 				new(*inmemory_tokens_storage.Repository),
 			),
 
 			wire.Bind(
-				new(driven.UsersStorage),
+				new(users.Storage),
 				new(*inmemory_users_storage.Repository),
 			),
 
 			// usecases
 			wire.Bind(
-				new(usecases.UsersRegistrar),
+				new(usecases2.UsersRegistrar),
 				new(*registrations.UsersRegistrar),
 			),
 
 			wire.Bind(
-				new(usecases.UsersLoginManager),
+				new(usecases2.UsersLoginManager),
 				new(*login.UsersLoginManager),
 			),
 

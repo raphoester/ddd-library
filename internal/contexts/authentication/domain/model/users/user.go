@@ -1,19 +1,20 @@
-package auth_model
+package users
 
 import (
 	"errors"
 	"fmt"
 	"time"
 
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/id"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/passwords"
 	"github.com/raphoester/ddd-library/internal/pkg/timeutil"
-	"github.com/raphoester/ddd-library/internal/pkg/validator"
 )
 
 type User struct {
-	id           ID
+	id           id.ID
 	role         Role
 	emailAddress EmailAddress
-	password     Password
+	password     passwords.Password
 	createdAt    time.Time
 	isActive     bool
 }
@@ -42,55 +43,10 @@ func (u *User) Validate() error {
 	return nil
 }
 
-type Role string
-
-const (
-	RoleAdmin Role = "admin"
-	RoleUser  Role = "user"
-)
-
-func NewRole(value string) (Role, error) {
-	role := Role(value)
-	switch role {
-	case RoleAdmin, RoleUser:
-		return role, nil
-	default:
-		return "", errors.New("role does not exist")
-	}
-}
-
-func (r Role) Validate() error {
-	if _, err := NewRole(string(r)); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-type EmailAddress string
-
-func NewEmailAddress(value string) (EmailAddress, error) {
-	err := validator.New().Var(value, "required,email")
-	if err != nil {
-		return "", fmt.Errorf("invalid email address: %w", err)
-	}
-
-	return EmailAddress(value), nil
-}
-
-func (e EmailAddress) String() string {
-	return string(e)
-}
-
-func (e EmailAddress) Validate() error {
-	_, err := NewEmailAddress(string(e))
-	return err
-}
-
 type NewUserParams struct {
 	EmailAddress EmailAddress
 	Role         Role
-	Password     Password
+	Password     passwords.Password
 }
 
 func (p NewUserParams) Validate() error {
@@ -116,7 +72,7 @@ func NewUser(params NewUserParams) (*User, error) {
 	}
 
 	return &User{
-		id:           NewID(),
+		id:           id.NewID(),
 		createdAt:    timeutil.Now(),
 		isActive:     false,
 		role:         params.Role,
@@ -129,7 +85,7 @@ func (u *User) CheckPassword(pw string) (bool, error) {
 	return u.password.Check(pw)
 }
 
-func (u *User) GetID() ID {
+func (u *User) GetID() id.ID {
 	return u.id
 }
 
@@ -139,4 +95,8 @@ func (u *User) HasEmailAddress(email EmailAddress) bool {
 
 func (u *User) GetEmailAddress() EmailAddress {
 	return u.emailAddress
+}
+
+func (u *User) IsActive() bool {
+	return u.isActive
 }

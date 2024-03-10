@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/driven"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/tokens"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 )
 
 func NewUsersLoginManager(
-	usersStorage driven.UsersStorage,
-	tokensStorage driven.TokensStorage,
+	usersStorage users.Storage,
+	tokensStorage tokens.Storage,
 ) *UsersLoginManager {
 	return &UsersLoginManager{
 		usersStorage:  usersStorage,
@@ -20,11 +20,11 @@ func NewUsersLoginManager(
 }
 
 type UsersLoginManager struct {
-	usersStorage  driven.UsersStorage
-	tokensStorage driven.TokensStorage
+	usersStorage  users.Storage
+	tokensStorage tokens.Storage
 }
 
-func (u *UsersLoginManager) Login(ctx context.Context, params usecases.LoginParams) (*auth_model.Token, error) {
+func (u *UsersLoginManager) Login(ctx context.Context, params usecases.LoginParams) (*tokens.Token, error) {
 
 	user, err := u.usersStorage.FindUserFromEmail(ctx, params.Email)
 	if err != nil {
@@ -40,10 +40,10 @@ func (u *UsersLoginManager) Login(ctx context.Context, params usecases.LoginPara
 		return nil, fmt.Errorf("invalid password")
 	}
 
-	token, err := auth_model.NewToken(
-		auth_model.NewTokenParams{
-			AccessToken:  auth_model.NewAccessToken(),
-			RefreshToken: auth_model.NewRefreshToken(),
+	token, err := tokens.NewToken(
+		tokens.NewTokenParams{
+			AccessToken:  tokens.NewAccessToken(),
+			RefreshToken: tokens.NewRefreshToken(),
 			ForUser:      *user,
 		},
 	)

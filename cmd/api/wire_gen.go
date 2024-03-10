@@ -7,11 +7,11 @@
 package main
 
 import (
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/login"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrations"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_tokens_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/controller"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/login"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/registrations"
 )
 
 // Injectors from wire.go:

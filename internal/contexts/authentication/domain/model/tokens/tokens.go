@@ -1,10 +1,12 @@
-package auth_model
+package tokens
 
 import (
 	"errors"
 	"fmt"
 	"time"
 
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/id"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
 	"github.com/raphoester/ddd-library/internal/pkg/randomutil"
 	"github.com/raphoester/ddd-library/internal/pkg/timeutil"
 )
@@ -13,7 +15,7 @@ type Token struct {
 	accessToken  AccessToken
 	refreshToken RefreshToken
 	expiresAt    TokenExpiration
-	userID       ID
+	userID       id.ID
 }
 
 func (t *Token) GetAccessToken() AccessToken {
@@ -73,7 +75,7 @@ func (t TokenExpiration) IsExpired(now time.Time) bool {
 type NewTokenParams struct {
 	AccessToken  AccessToken
 	RefreshToken RefreshToken
-	ForUser      User
+	ForUser      users.User
 }
 
 func (p *NewTokenParams) IsValid() error {
@@ -89,7 +91,7 @@ func (p *NewTokenParams) IsValid() error {
 		return fmt.Errorf("invalid user: %w", err)
 	}
 
-	if !p.ForUser.isActive {
+	if !p.ForUser.IsActive() {
 		return errors.New("user is not active")
 	}
 
@@ -105,7 +107,7 @@ func NewToken(params NewTokenParams) (*Token, error) {
 		accessToken:  params.AccessToken,
 		refreshToken: params.RefreshToken,
 		expiresAt:    accessTokenExpirationPolicy.NewExpirationTime(),
-		userID:       params.ForUser.id,
+		userID:       params.ForUser.GetID(),
 	}, nil
 }
 
@@ -121,7 +123,7 @@ func (t *Token) GetExpiration() TokenExpiration {
 	return t.expiresAt
 }
 
-func (t *Token) GetUserID() ID {
+func (t *Token) GetUserID() id.ID {
 	return t.userID
 }
 

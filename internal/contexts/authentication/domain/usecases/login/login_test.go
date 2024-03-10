@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/passwords"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/login"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_tokens_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/login"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -44,14 +45,14 @@ func TestLogin_UserDoesNotExist(t *testing.T) {
 
 func TestLogin_InvalidPassword(t *testing.T) {
 
-	email, _ := auth_model.NewEmailAddress("john.doe@gmail.com")
-	password, _ := auth_model.NewPassword("password")
+	email, _ := users.NewEmailAddress("john.doe@gmail.com")
+	password, _ := passwords.NewPassword("password")
 
-	preMadeUser, err := auth_model.NewUser(
-		auth_model.NewUserParams{
+	preMadeUser, err := users.NewUser(
+		users.NewUserParams{
 			EmailAddress: email,
 			Password:     *password,
-			Role:         auth_model.RoleUser,
+			Role:         users.RoleUser,
 		},
 	)
 	require.NoError(t, err)
