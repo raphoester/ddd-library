@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/adapters/inmemory_users_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/auth_model"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/ports/usecases"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/registrations"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +14,8 @@ import (
 )
 
 func TestUsersRegistrar_RegisterUser(t *testing.T) {
-	validEmail, _ := auth_model.NewEmailAddress("test@example.com")
+	testEmail, _ := auth_model.NewEmailAddress("test@example.com")
+	testPassword, _ := auth_model.NewPassword("password")
 
 	cases := []struct {
 		name                  string
@@ -24,22 +25,6 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 		expectedErrorContains string
 	}{
 		{
-			name: "invalid email",
-			params: usecases.RegisterUserParams{
-				Email:    "?",
-				Password: "password",
-			},
-			expectError:           true,
-			expectedErrorContains: "failed to create email address",
-		}, {
-			name: "password too short",
-			params: usecases.RegisterUserParams{
-				Email:    validEmail.String(),
-				Password: "short",
-			},
-			expectError:           true,
-			expectedErrorContains: "failed to create password",
-		}, {
 			name: "user already exists with email",
 			setupFunc: func(usersStorage *inmemory_users_storage.Repository) {
 				password, err := auth_model.NewPassword("password")
@@ -48,7 +33,7 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 				user, err := auth_model.NewUser(
 					auth_model.NewUserParams{
 						Role:         auth_model.RoleUser,
-						EmailAddress: validEmail,
+						EmailAddress: testEmail,
 						Password:     *password,
 					},
 				)
@@ -58,16 +43,16 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 				require.NoError(t, err)
 			},
 			params: usecases.RegisterUserParams{
-				Email:    validEmail.String(),
-				Password: "password",
+				Email:    testEmail,
+				Password: *testPassword,
 			},
 			expectError:           true,
 			expectedErrorContains: "email address already in use",
 		}, {
 			name: "valid",
 			params: usecases.RegisterUserParams{
-				Email:    validEmail.String(),
-				Password: "password",
+				Email:    testEmail,
+				Password: *testPassword,
 			},
 			expectError: false,
 		},
@@ -76,6 +61,7 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 	for _, c := range cases {
 		t.Run(
 			c.name, func(t *testing.T) {
+
 				usersStorage := inmemory_users_storage.New()
 				if c.setupFunc != nil {
 					c.setupFunc(usersStorage)
@@ -88,7 +74,7 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 					assert.True(t, strings.Contains(err.Error(), c.expectedErrorContains))
 				} else {
 					require.NoError(t, err)
-					_, err := usersStorage.FindUserFromEmail(context.Background(), validEmail)
+					_, err := usersStorage.FindUserFromEmail(context.Background(), testEmail)
 					require.NoError(t, err)
 				}
 			},

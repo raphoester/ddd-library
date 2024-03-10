@@ -21,19 +21,9 @@ func NewUsersRegistrar(usersStorage driven.UsersStorage) *UsersRegistrar {
 
 func (r *UsersRegistrar) RegisterUser(ctx context.Context, params usecases.RegisterUserParams) error {
 
-	emailAddress, err := auth_model.NewEmailAddress(params.Email)
-	if err != nil {
-		return fmt.Errorf("failed to create email address: %w", err)
-	}
-
-	password, err := auth_model.NewPassword(params.Password)
-	if err != nil {
-		return fmt.Errorf("failed to create password: %w", err)
-	}
-
 	createUserParams := auth_model.NewUserParams{
-		EmailAddress: emailAddress,
-		Password:     *password,
+		EmailAddress: params.Email,
+		Password:     params.Password,
 		Role:         auth_model.RoleUser,
 	}
 

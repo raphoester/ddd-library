@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/raphoester/ddd-library/internal/pkg/randomutil"
+	"github.com/raphoester/ddd-library/internal/pkg/timeutil"
 )
 
 type Token struct {
@@ -15,7 +16,15 @@ type Token struct {
 	userID       ID
 }
 
+func (t *Token) GetAccessToken() AccessToken {
+	return t.accessToken
+}
+
 type AccessToken string
+
+func (a AccessToken) String() string {
+	return string(a)
+}
 
 func NewAccessToken() AccessToken {
 	return AccessToken(randomutil.NewString(64))
@@ -53,6 +62,10 @@ func (t TokenExpiration) Validate() error {
 	return nil
 }
 
+func (t TokenExpiration) Time() time.Time {
+	return time.Time(t)
+}
+
 func (t TokenExpiration) IsExpired(now time.Time) bool {
 	return time.Time(t).Before(now)
 }
@@ -60,8 +73,7 @@ func (t TokenExpiration) IsExpired(now time.Time) bool {
 type NewTokenParams struct {
 	AccessToken  AccessToken
 	RefreshToken RefreshToken
-	ExpiresAt    TokenExpiration
-	ForUserID    ID
+	ForUser      User
 }
 
 func (p *NewTokenParams) IsValid() error {
@@ -73,12 +85,12 @@ func (p *NewTokenParams) IsValid() error {
 		return fmt.Errorf("refresh token is invalid: %w", err)
 	}
 
-	if err := p.ExpiresAt.Validate(); err != nil {
-		return fmt.Errorf("invalid expiration time: %w", err)
+	if err := p.ForUser.Validate(); err != nil {
+		return fmt.Errorf("invalid user: %w", err)
 	}
 
-	if err := p.ForUserID.Validate(); err != nil {
-		return fmt.Errorf("invalid user id: %w", err)
+	if !p.ForUser.isActive {
+		return errors.New("user is not active")
 	}
 
 	return nil
@@ -92,15 +104,45 @@ func NewToken(params NewTokenParams) (*Token, error) {
 	return &Token{
 		accessToken:  params.AccessToken,
 		refreshToken: params.RefreshToken,
-		expiresAt:    params.ExpiresAt,
-		userID:       params.ForUserID,
+		expiresAt:    accessTokenExpirationPolicy.NewExpirationTime(),
+		userID:       params.ForUser.id,
 	}, nil
 }
 
-func (a Token) IsExpired(now time.Time) bool {
-	return a.expiresAt.IsExpired(now)
+func (t *Token) IsExpired(now time.Time) bool {
+	return t.expiresAt.IsExpired(now)
 }
 
-func (a Token) GetUserID() ID {
-	return a.userID
+func (t *Token) GetRefreshToken() RefreshToken {
+	return t.refreshToken
+}
+
+func (t *Token) GetExpiration() TokenExpiration {
+	return t.expiresAt
+}
+
+func (t *Token) GetUserID() ID {
+	return t.userID
+}
+
+type TokenExpirationPolicy struct {
+	timeProvider        timeutil.Provider
+	accessTokenLifetime time.Duration
+}
+
+func NewTokenExpirationPolicy(provider timeutil.Provider, lifetime time.Duration) TokenExpirationPolicy {
+	return TokenExpirationPolicy{
+		timeProvider:        provider,
+		accessTokenLifetime: lifetime,
+	}
+}
+
+func (p TokenExpirationPolicy) NewExpirationTime() TokenExpiration {
+	return TokenExpiration(p.timeProvider.Now().Add(p.accessTokenLifetime))
+}
+
+var accessTokenExpirationPolicy = NewTokenExpirationPolicy(timeutil.NewActualProvider(), 24*time.Hour)
+
+func SetAccessTokenExpirationPolicy(policy TokenExpirationPolicy) {
+	accessTokenExpirationPolicy = policy
 }

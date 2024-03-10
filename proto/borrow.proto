@@ -4,5 +4,5 @@ package library;
 
 option go_package = "github.com/raphoester/internal/contexts/borrow/infrastructure/proto";
 
-import "google/protobuf/timestamp.proto";
+//import "google/protobuf/timestamp.proto";
 

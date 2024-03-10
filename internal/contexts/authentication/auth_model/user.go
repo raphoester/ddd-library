@@ -18,6 +18,30 @@ type User struct {
 	isActive     bool
 }
 
+func (u *User) Validate() error {
+	if err := u.id.Validate(); err != nil {
+		return fmt.Errorf("invalid id: %w", err)
+	}
+
+	if err := u.role.Validate(); err != nil {
+		return fmt.Errorf("invalid role: %w", err)
+	}
+
+	if err := u.emailAddress.Validate(); err != nil {
+		return fmt.Errorf("invalid email address: %w", err)
+	}
+
+	if err := u.password.Validate(); err != nil {
+		return fmt.Errorf("invalid password: %w", err)
+	}
+
+	if u.createdAt.IsZero() {
+		return errors.New("invalid created at time")
+	}
+
+	return nil
+}
+
 type Role string
 
 const (

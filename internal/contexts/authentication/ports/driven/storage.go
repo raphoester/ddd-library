@@ -13,5 +13,5 @@ type UsersStorage interface {
 }
 
 type TokensStorage interface {
-	StoreToken(ctx context.Context, token string) error
+	SaveToken(ctx context.Context, token *auth_model.Token) error
 }

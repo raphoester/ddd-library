@@ -7,16 +7,20 @@
 package main
 
 import (
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/adapters/inmemory_users_storage"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/controllers/registration_controllers"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_tokens_storage"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/controller"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/login"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/usecases/registrations"
 )
 
 // Injectors from wire.go:
 
-func getUsersAuthController() *registration_controllers.UsersController {
+func getUsersAuthController() *controller.Controller {
 	repository := inmemory_users_storage.New()
 	usersRegistrar := registrations.NewUsersRegistrar(repository)
-	usersController := registration_controllers.New(usersRegistrar)
-	return usersController
+	inmemory_tokens_storageRepository := inmemory_tokens_storage.New()
+	usersLoginManager := login.NewUsersLoginManager(repository, inmemory_tokens_storageRepository)
+	controllerController := controller.New(usersRegistrar, usersLoginManager)
+	return controllerController
 }
