@@ -1,4 +1,4 @@
-package passwords
+package users
 
 import (
 	"fmt"
@@ -75,7 +75,7 @@ func plaintextPasswordWithSalt(plaintextPassword, salt string) string {
 	return plaintextPassword + salt
 }
 
-func (p *Password) Validate() error {
+func (p *Password) validate() error {
 	if p.hashedPassword == "" {
 		return fmt.Errorf("password is empty")
 	}

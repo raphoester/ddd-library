@@ -1,4 +1,4 @@
-package passwords
+package users
 
 import (
 	"strings"

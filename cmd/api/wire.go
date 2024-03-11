@@ -22,7 +22,7 @@ func getUsersAuthController() *controller.Controller {
 			inmemory_users_storage.New,
 			inmemory_tokens_storage.New,
 			registrations.NewUsersRegistrar,
-			login.NewUsersLoginManager,
+			login.NewUsersAuthenticator,
 
 			// repositories
 			wire.Bind(
@@ -43,7 +43,7 @@ func getUsersAuthController() *controller.Controller {
 
 			wire.Bind(
 				new(usecases2.UsersLoginManager),
-				new(*login.UsersLoginManager),
+				new(*login.UsersAuthenticator),
 			),
 
 			controller.New,

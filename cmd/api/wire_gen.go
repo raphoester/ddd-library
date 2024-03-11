@@ -20,7 +20,7 @@ func getUsersAuthController() *controller.Controller {
 	repository := inmemory_users_storage.New()
 	usersRegistrar := registrations.NewUsersRegistrar(repository)
 	inmemory_tokens_storageRepository := inmemory_tokens_storage.New()
-	usersLoginManager := login.NewUsersLoginManager(repository, inmemory_tokens_storageRepository)
-	controllerController := controller.New(usersRegistrar, usersLoginManager)
+	usersAuthenticator := login.NewUsersAuthenticator(repository, inmemory_tokens_storageRepository)
+	controllerController := controller.New(usersRegistrar, usersAuthenticator)
 	return controllerController
 }

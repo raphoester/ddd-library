@@ -7,11 +7,14 @@ WIRE=./vendor/github.com/google/wire/cmd/wire
 BCS := authentication borrow
 PROTO_DIR := ./proto
 CONTEXTS_DIR := ./internal/contexts
+CONTEXT := borrow
 
 PROTOC := protoc
 PROTOC_GEN_GO := protoc-gen-go
 PROTOC_GEN_GO_GRPC := protoc-gen-go-grpc
 PROTOC_GO_INJECT_TAG := protoc-go-inject-tag
+
+.PHONY: all wire build clean run proto migration
 
 wire:
 	@echo "Generating dependency injection..."
@@ -24,12 +27,17 @@ build: proto wire
 clean:
 	@echo "Cleaning..."
 	@go clean
+	@go clean -testcache
 	@rm -rf $(PROTO_GEN_DIR)/*/infrastructure/proto
 	@rm -f ${BINARY_NAME}
 
 run: proto wire
 	@echo "Running app..."
 	@go run ${MAIN_PACKAGE}
+
+test: proto wire
+	@echo "Running tests..."
+	@go test ./... | grep -v "no test files"
 
 proto:
 	@echo "Generating grpc code from proto files"
@@ -49,4 +57,17 @@ proto:
 		\
 	)
 
-.PHONY: all wire build clean run proto
+migration:
+	@echo "Generating migration..."
+	@if [ -z $(MG_NAME) ]; then \
+		echo "Please provide a migration name (MG_NAME)"; \
+		exit 1; \
+	fi
+
+	@if [ -z $(CONTEXT) ]; then \
+		echo "Undefined CONTEXT, defaulting to \"borrow\""; \
+		exit 1; \
+	fi
+
+	@migrate  create -ext sql -dir ./internal/contexts/$(CONTEXT)/infrastructure/sql/migrations/ -seq $(MG_NAME)
+

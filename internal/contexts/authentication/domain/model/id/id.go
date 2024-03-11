@@ -8,8 +8,17 @@ import (
 
 type ID uuid.UUID
 
-func NewID() ID {
+func Create() ID {
 	return ID(uuid.New())
+}
+
+func NewFromString(str string) (*ID, error) {
+	uid, err := uuid.Parse(str)
+	if err != nil {
+		return nil, err
+	}
+
+	return (*ID)(&uid), nil
 }
 
 func (id ID) String() string {

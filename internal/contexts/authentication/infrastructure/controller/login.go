@@ -17,7 +17,7 @@ func (c *Controller) Login(ctx context.Context, req *proto.LoginRequest) (*proto
 		return nil, err
 	}
 
-	token, err := c.loginManager.Login(ctx, *params)
+	token, err := c.loginManager.Authenticate(ctx, *params)
 	if err != nil {
 		return nil, err
 	}

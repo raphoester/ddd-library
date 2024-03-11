@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/passwords"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrations"
@@ -16,7 +15,7 @@ import (
 
 func TestUsersRegistrar_RegisterUser(t *testing.T) {
 	testEmail, _ := users.NewEmailAddress("test@example.com")
-	testPassword, _ := passwords.NewPassword("password")
+	testPassword, _ := users.NewPassword("password")
 
 	cases := []struct {
 		name                  string
@@ -28,11 +27,11 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 		{
 			name: "user already exists with email",
 			setupFunc: func(usersStorage *inmemory_users_storage.Repository) {
-				password, err := passwords.NewPassword("password")
+				password, err := users.NewPassword("password")
 				require.NoError(t, err)
 
-				user, err := users.NewUser(
-					users.NewUserParams{
+				user, err := users.CreateUser(
+					users.CreateUserParams{
 						Role:         users.RoleUser,
 						EmailAddress: testEmail,
 						Password:     *password,
@@ -40,7 +39,7 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 				)
 				require.NoError(t, err)
 
-				err = usersStorage.RegisterUser(context.Background(), user)
+				err = users.Register(context.Background(), usersStorage, user)
 				require.NoError(t, err)
 			},
 			params: usecases.RegisterUserParams{
@@ -75,7 +74,7 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 					assert.True(t, strings.Contains(err.Error(), c.expectedErrorContains))
 				} else {
 					require.NoError(t, err)
-					_, err := usersStorage.FindUserFromEmail(context.Background(), testEmail)
+					_, err := users.FindFromEmail(context.Background(), usersStorage, c.params.Email)
 					require.NoError(t, err)
 				}
 			},

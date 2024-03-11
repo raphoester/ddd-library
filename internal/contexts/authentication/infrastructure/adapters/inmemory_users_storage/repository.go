@@ -11,45 +11,48 @@ import (
 
 type Repository struct {
 	mu    sync.Mutex
-	users map[id.ID]*users.User
+	users map[id.ID]*users.UserDAO
 }
 
 func New() *Repository {
 	return &Repository{
-		users: make(map[id.ID]*users.User),
+		users: make(map[id.ID]*users.UserDAO),
 	}
 }
 
-func (r *Repository) RegisterUser(_ context.Context, user *users.User) error {
+func (r *Repository) Register(ctx context.Context, user *users.UserDAO) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
 	for _, existingUser := range r.users {
-		if existingUser.GetEmailAddress() == user.GetEmailAddress() {
+		if existingUser.EmailAddress == user.EmailAddress {
 			return fmt.Errorf("email address already in use")
 		}
 	}
-	r.users[user.GetID()] = user
+
+	r.users[user.ID] = user
 	return nil
 }
 
-func (r *Repository) FindUserByID(_ context.Context, id id.ID) (*users.User, error) {
+func (r *Repository) Find(ctx context.Context, id id.ID) (*users.UserDAO, error) {
 	r.mu.Lock()
+	defer r.mu.Unlock()
 	user, ok := r.users[id]
-	r.mu.Unlock()
 	if !ok {
 		return nil, fmt.Errorf("user with id %s not found", id)
 	}
 	return user, nil
 }
 
-func (r *Repository) FindUserFromEmail(_ context.Context, email users.EmailAddress) (*users.User, error) {
+func (r *Repository) FindFromEmail(_ context.Context, email string) (*users.UserDAO, error) {
 	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	for _, user := range r.users {
-		if user.HasEmailAddress(email) {
+		if user.EmailAddress == email {
 			return user, nil
 		}
 	}
-	r.mu.Unlock()
 
 	return nil, fmt.Errorf("user with email %s not found", email)
 }

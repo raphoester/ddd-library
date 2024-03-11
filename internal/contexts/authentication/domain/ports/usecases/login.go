@@ -13,5 +13,5 @@ type LoginParams struct {
 }
 
 type UsersLoginManager interface {
-	Login(ctx context.Context, params LoginParams) (*tokens.Token, error)
+	Authenticate(ctx context.Context, params LoginParams) (*tokens.Token, error)
 }

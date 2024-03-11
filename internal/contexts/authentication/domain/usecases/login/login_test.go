@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/passwords"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/login"
@@ -17,7 +16,7 @@ import (
 func getLoginManager(setup func(
 	usersStorage *inmemory_users_storage.Repository,
 	tokensStorage *inmemory_tokens_storage.Repository),
-) *login.UsersLoginManager {
+) *login.UsersAuthenticator {
 
 	usersStorage := inmemory_users_storage.New()
 	tokensStorage := inmemory_tokens_storage.New()
@@ -26,7 +25,7 @@ func getLoginManager(setup func(
 		setup(usersStorage, tokensStorage)
 	}
 
-	useCase := login.NewUsersLoginManager(usersStorage, tokensStorage)
+	useCase := login.NewUsersAuthenticator(usersStorage, tokensStorage)
 	return useCase
 }
 
@@ -38,7 +37,7 @@ func TestLogin_UserDoesNotExist(t *testing.T) {
 		PlainPassword: "password",
 	}
 
-	_, err := useCase.Login(context.Background(), params)
+	_, err := useCase.Authenticate(context.Background(), params)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to find user")
 }
@@ -46,10 +45,10 @@ func TestLogin_UserDoesNotExist(t *testing.T) {
 func TestLogin_InvalidPassword(t *testing.T) {
 
 	email, _ := users.NewEmailAddress("john.doe@gmail.com")
-	password, _ := passwords.NewPassword("password")
+	password, _ := users.NewPassword("password")
 
-	preMadeUser, err := users.NewUser(
-		users.NewUserParams{
+	preMadeUser, err := users.CreateUser(
+		users.CreateUserParams{
 			EmailAddress: email,
 			Password:     *password,
 			Role:         users.RoleUser,
@@ -62,7 +61,7 @@ func TestLogin_InvalidPassword(t *testing.T) {
 			usersStorage *inmemory_users_storage.Repository,
 			tokensStorage *inmemory_tokens_storage.Repository,
 		) {
-			err := usersStorage.RegisterUser(context.Background(), preMadeUser)
+			err := users.Register(context.Background(), usersStorage, preMadeUser)
 			require.NoError(t, err)
 		},
 	)
@@ -72,7 +71,7 @@ func TestLogin_InvalidPassword(t *testing.T) {
 		PlainPassword: "invalid_password",
 	}
 
-	_, err = useCase.Login(context.Background(), params)
+	_, err = useCase.Authenticate(context.Background(), params)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid password")
 }

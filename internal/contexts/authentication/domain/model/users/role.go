@@ -14,10 +14,14 @@ const (
 
 var validRoles = []Role{RoleAdmin, RoleUser}
 
-func (r Role) Validate() error {
+func (r Role) validate() error {
 	if !slices.Contains(validRoles, r) {
 		return errors.New("invalid role")
 	}
 
 	return nil
+}
+
+func (r Role) String() string {
+	return string(r)
 }

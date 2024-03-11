@@ -9,24 +9,24 @@ import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 )
 
-func NewUsersLoginManager(
+func NewUsersAuthenticator(
 	usersStorage users.Storage,
 	tokensStorage tokens.Storage,
-) *UsersLoginManager {
-	return &UsersLoginManager{
+) *UsersAuthenticator {
+	return &UsersAuthenticator{
 		usersStorage:  usersStorage,
 		tokensStorage: tokensStorage,
 	}
 }
 
-type UsersLoginManager struct {
+type UsersAuthenticator struct {
 	usersStorage  users.Storage
 	tokensStorage tokens.Storage
 }
 
-func (u *UsersLoginManager) Login(ctx context.Context, params usecases.LoginParams) (*tokens.Token, error) {
+func (u *UsersAuthenticator) Authenticate(ctx context.Context, params usecases.LoginParams) (*tokens.Token, error) {
 
-	user, err := u.usersStorage.FindUserFromEmail(ctx, params.Email)
+	user, err := users.FindFromEmail(ctx, u.usersStorage, params.Email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user: %w", err)
 	}
@@ -40,8 +40,8 @@ func (u *UsersLoginManager) Login(ctx context.Context, params usecases.LoginPara
 		return nil, fmt.Errorf("invalid password")
 	}
 
-	token, err := tokens.NewToken(
-		tokens.NewTokenParams{
+	token, err := tokens.CreateToken(
+		tokens.CreateTokenParams{
 			AccessToken:  tokens.NewAccessToken(),
 			RefreshToken: tokens.NewRefreshToken(),
 			ForUser:      *user,
