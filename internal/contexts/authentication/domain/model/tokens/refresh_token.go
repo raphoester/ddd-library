@@ -3,13 +3,13 @@ package tokens
 import (
 	"errors"
 
-	"github.com/raphoester/ddd-library/internal/pkg/randomutil"
+	"github.com/raphoester/ddd-library/internal/pkg/random"
 )
 
 type RefreshToken string
 
 func NewRefreshToken() RefreshToken {
-	return RefreshToken(randomutil.NewString(64))
+	return RefreshToken(random.NewString(64))
 }
 
 func (r RefreshToken) validate() error {

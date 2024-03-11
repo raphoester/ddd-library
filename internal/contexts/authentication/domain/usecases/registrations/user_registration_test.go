@@ -30,8 +30,8 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 				password, err := users.NewPassword("password")
 				require.NoError(t, err)
 
-				user, err := users.CreateUser(
-					users.CreateUserParams{
+				user, err := users.NewUser(
+					users.NewUserParams{
 						Role:         users.RoleUser,
 						EmailAddress: testEmail,
 						Password:     *password,

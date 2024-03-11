@@ -21,7 +21,7 @@ func (e EmailAddress) String() string {
 	return string(e)
 }
 
-func (e EmailAddress) Validate() error {
+func (e EmailAddress) validate() error {
 	_, err := NewEmailAddress(string(e))
 	return err
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/raphoester/ddd-library/internal/pkg/cryptoutil"
-	"github.com/raphoester/ddd-library/internal/pkg/randomutil"
+	"github.com/raphoester/ddd-library/internal/pkg/random"
 )
 
 type Password struct {
@@ -15,7 +15,7 @@ type Password struct {
 func NewPassword(value string) (*Password, error) {
 	var password = &Password{}
 	if err := password.GenerateSalt(func() string {
-		return randomutil.NewString(10)
+		return random.NewString(10)
 	}); err != nil {
 		return nil, err
 	}

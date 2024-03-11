@@ -3,7 +3,7 @@ package tokens
 import (
 	"errors"
 
-	"github.com/raphoester/ddd-library/internal/pkg/randomutil"
+	"github.com/raphoester/ddd-library/internal/pkg/random"
 )
 
 type AccessToken string
@@ -13,7 +13,7 @@ func (a AccessToken) String() string {
 }
 
 func NewAccessToken() AccessToken {
-	return AccessToken(randomutil.NewString(64))
+	return AccessToken(random.NewString(64))
 }
 
 func (a AccessToken) validate() error {

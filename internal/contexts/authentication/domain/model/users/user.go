@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/id"
-	"github.com/raphoester/ddd-library/internal/pkg/timeutil"
+	"github.com/raphoester/ddd-library/internal/pkg/time_provider"
 )
 
 type User struct {
@@ -27,7 +27,7 @@ func (u *User) validate() error {
 		return fmt.Errorf("invalid role: %w", err)
 	}
 
-	if err := u.emailAddress.Validate(); err != nil {
+	if err := u.emailAddress.validate(); err != nil {
 		return fmt.Errorf("invalid email address: %w", err)
 	}
 
@@ -42,17 +42,17 @@ func (u *User) validate() error {
 	return nil
 }
 
-type CreateUserParams struct {
+type NewUserParams struct {
 	EmailAddress EmailAddress
 	Role         Role
 	Password     Password
 }
 
-func CreateUser(params CreateUserParams) (*User, error) {
+func NewUser(params NewUserParams) (*User, error) {
 
 	user := &User{
 		id:           id.Create(),
-		createdAt:    timeutil.Now(),
+		createdAt:    time_provider.Now(),
 		isActive:     false,
 		role:         params.Role,
 		emailAddress: params.EmailAddress,

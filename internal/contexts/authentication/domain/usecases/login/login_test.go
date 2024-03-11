@@ -47,8 +47,8 @@ func TestLogin_InvalidPassword(t *testing.T) {
 	email, _ := users.NewEmailAddress("john.doe@gmail.com")
 	password, _ := users.NewPassword("password")
 
-	preMadeUser, err := users.CreateUser(
-		users.CreateUserParams{
+	preMadeUser, err := users.NewUser(
+		users.NewUserParams{
 			EmailAddress: email,
 			Password:     *password,
 			Role:         users.RoleUser,

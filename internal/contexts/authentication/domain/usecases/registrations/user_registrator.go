@@ -20,13 +20,13 @@ func NewUsersRegistrar(usersStorage users.Storage) *UsersRegistrar {
 
 func (r *UsersRegistrar) RegisterUser(ctx context.Context, params usecases.RegisterUserParams) error {
 
-	createUserParams := users.CreateUserParams{
+	newUserParams := users.NewUserParams{
 		EmailAddress: params.Email,
 		Password:     params.Password,
 		Role:         users.RoleUser,
 	}
 
-	user, err := users.CreateUser(createUserParams)
+	user, err := users.NewUser(newUserParams)
 	if err != nil {
 		return fmt.Errorf("failed to create a new user: %w", err)
 	}
