@@ -19,3 +19,7 @@ func (r RefreshToken) validate() error {
 
 	return nil
 }
+
+func (r RefreshToken) String() string {
+	return string(r)
+}

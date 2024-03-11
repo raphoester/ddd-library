@@ -1,4 +1,4 @@
-package login
+package authenticator
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 )
 
-func NewUsersAuthenticator(
+func New(
 	usersStorage users.Storage,
 	tokensStorage tokens.Storage,
 ) *UsersAuthenticator {
@@ -24,9 +24,9 @@ type UsersAuthenticator struct {
 	tokensStorage tokens.Storage
 }
 
-func (u *UsersAuthenticator) Authenticate(ctx context.Context, params usecases.LoginParams) (*tokens.Token, error) {
+func (u *UsersAuthenticator) Authenticate(ctx context.Context, params usecases.AuthenticateParams) (*tokens.Token, error) {
 
-	user, err := users.FindFromEmail(ctx, u.usersStorage, params.Email)
+	user, err := users.GetFromEmail(ctx, u.usersStorage, params.Email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user: %w", err)
 	}
@@ -51,7 +51,7 @@ func (u *UsersAuthenticator) Authenticate(ctx context.Context, params usecases.L
 		return nil, err
 	}
 
-	if err := u.tokensStorage.SaveToken(ctx, token); err != nil {
+	if err := tokens.SaveToken(ctx, u.tokensStorage, token); err != nil {
 		return nil, err
 	}
 

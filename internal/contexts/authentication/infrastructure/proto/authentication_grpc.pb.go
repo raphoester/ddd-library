@@ -19,16 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Authentication_RegisterUser_FullMethodName = "/library.Authentication/RegisterUser"
-	Authentication_Login_FullMethodName        = "/library.Authentication/Login"
+	Authentication_Register_FullMethodName      = "/library.Authentication/Register"
+	Authentication_Login_FullMethodName         = "/library.Authentication/Login"
+	Authentication_ValidateToken_FullMethodName = "/library.Authentication/ValidateToken"
 )
 
 // AuthenticationClient is the client API for Authentication service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthenticationClient interface {
-	RegisterUser(ctx context.Context, in *RegisterUserRequest, opts ...grpc.CallOption) (*RegisterUserResponse, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
 }
 
 type authenticationClient struct {
@@ -39,9 +41,9 @@ func NewAuthenticationClient(cc grpc.ClientConnInterface) AuthenticationClient {
 	return &authenticationClient{cc}
 }
 
-func (c *authenticationClient) RegisterUser(ctx context.Context, in *RegisterUserRequest, opts ...grpc.CallOption) (*RegisterUserResponse, error) {
-	out := new(RegisterUserResponse)
-	err := c.cc.Invoke(ctx, Authentication_RegisterUser_FullMethodName, in, out, opts...)
+func (c *authenticationClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
+	out := new(RegisterResponse)
+	err := c.cc.Invoke(ctx, Authentication_Register_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,12 +59,22 @@ func (c *authenticationClient) Login(ctx context.Context, in *LoginRequest, opts
 	return out, nil
 }
 
+func (c *authenticationClient) ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error) {
+	out := new(ValidateTokenResponse)
+	err := c.cc.Invoke(ctx, Authentication_ValidateToken_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticationServer is the server API for Authentication service.
 // All implementations must embed UnimplementedAuthenticationServer
 // for forward compatibility
 type AuthenticationServer interface {
-	RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error)
+	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
 	mustEmbedUnimplementedAuthenticationServer()
 }
 
@@ -70,11 +82,14 @@ type AuthenticationServer interface {
 type UnimplementedAuthenticationServer struct {
 }
 
-func (UnimplementedAuthenticationServer) RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
+func (UnimplementedAuthenticationServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
 func (UnimplementedAuthenticationServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedAuthenticationServer) ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
 }
 func (UnimplementedAuthenticationServer) mustEmbedUnimplementedAuthenticationServer() {}
 
@@ -89,20 +104,20 @@ func RegisterAuthenticationServer(s grpc.ServiceRegistrar, srv AuthenticationSer
 	s.RegisterService(&Authentication_ServiceDesc, srv)
 }
 
-func _Authentication_RegisterUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterUserRequest)
+func _Authentication_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthenticationServer).RegisterUser(ctx, in)
+		return srv.(AuthenticationServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Authentication_RegisterUser_FullMethodName,
+		FullMethod: Authentication_Register_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServer).RegisterUser(ctx, req.(*RegisterUserRequest))
+		return srv.(AuthenticationServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -125,6 +140,24 @@ func _Authentication_Login_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authentication_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServer).ValidateToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Authentication_ValidateToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServer).ValidateToken(ctx, req.(*ValidateTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Authentication_ServiceDesc is the grpc.ServiceDesc for Authentication service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -133,12 +166,16 @@ var Authentication_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthenticationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "RegisterUser",
-			Handler:    _Authentication_RegisterUser_Handler,
+			MethodName: "Register",
+			Handler:    _Authentication_Register_Handler,
 		},
 		{
 			MethodName: "Login",
 			Handler:    _Authentication_Login_Handler,
+		},
+		{
+			MethodName: "ValidateToken",
+			Handler:    _Authentication_ValidateToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

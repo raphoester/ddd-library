@@ -1,4 +1,4 @@
-package login_test
+package authenticator_test
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/login"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/authenticator"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_tokens_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +16,7 @@ import (
 func getLoginManager(setup func(
 	usersStorage *inmemory_users_storage.Repository,
 	tokensStorage *inmemory_tokens_storage.Repository),
-) *login.UsersAuthenticator {
+) *authenticator.UsersAuthenticator {
 
 	usersStorage := inmemory_users_storage.New()
 	tokensStorage := inmemory_tokens_storage.New()
@@ -25,14 +25,14 @@ func getLoginManager(setup func(
 		setup(usersStorage, tokensStorage)
 	}
 
-	useCase := login.NewUsersAuthenticator(usersStorage, tokensStorage)
+	useCase := authenticator.New(usersStorage, tokensStorage)
 	return useCase
 }
 
 func TestLogin_UserDoesNotExist(t *testing.T) {
 	useCase := getLoginManager(nil)
 
-	params := usecases.LoginParams{
+	params := usecases.AuthenticateParams{
 		Email:         "example@example.test",
 		PlainPassword: "password",
 	}
@@ -66,7 +66,7 @@ func TestLogin_InvalidPassword(t *testing.T) {
 		},
 	)
 
-	params := usecases.LoginParams{
+	params := usecases.AuthenticateParams{
 		Email:         email,
 		PlainPassword: "invalid_password",
 	}

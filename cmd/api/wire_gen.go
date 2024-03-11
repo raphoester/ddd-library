@@ -7,8 +7,8 @@
 package main
 
 import (
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/login"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrations"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/authenticator"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrar"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_tokens_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/controller"
@@ -18,9 +18,9 @@ import (
 
 func getUsersAuthController() *controller.Controller {
 	repository := inmemory_users_storage.New()
-	usersRegistrar := registrations.NewUsersRegistrar(repository)
+	registrarRegistrar := registrar.New(repository)
 	inmemory_tokens_storageRepository := inmemory_tokens_storage.New()
-	usersAuthenticator := login.NewUsersAuthenticator(repository, inmemory_tokens_storageRepository)
-	controllerController := controller.New(usersRegistrar, usersAuthenticator)
+	usersAuthenticator := authenticator.New(repository, inmemory_tokens_storageRepository)
+	controllerController := controller.New(registrarRegistrar, usersAuthenticator)
 	return controllerController
 }

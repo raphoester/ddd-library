@@ -34,7 +34,7 @@ func (r *Repository) Register(ctx context.Context, user *users.UserDAO) error {
 	return nil
 }
 
-func (r *Repository) Find(ctx context.Context, id id.ID) (*users.UserDAO, error) {
+func (r *Repository) Get(ctx context.Context, id id.ID) (*users.UserDAO, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	user, ok := r.users[id]
@@ -44,7 +44,7 @@ func (r *Repository) Find(ctx context.Context, id id.ID) (*users.UserDAO, error)
 	return user, nil
 }
 
-func (r *Repository) FindFromEmail(_ context.Context, email string) (*users.UserDAO, error) {
+func (r *Repository) GetFromEmail(_ context.Context, email string) (*users.UserDAO, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

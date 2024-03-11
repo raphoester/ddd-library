@@ -7,11 +7,11 @@ import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
 )
 
-type AuthenticateParams struct {
-	Email         users.EmailAddress
-	PlainPassword string
+type ValidateTokenResponse struct {
+	IsValid bool
+	Role    users.Role
 }
 
-type Authenticator interface {
-	Authenticate(ctx context.Context, params AuthenticateParams) (*tokens.Token, error)
+type TokenValidator interface {
+	ValidateToken(ctx context.Context, accessToken tokens.AccessToken) (*ValidateTokenResponse, error)
 }

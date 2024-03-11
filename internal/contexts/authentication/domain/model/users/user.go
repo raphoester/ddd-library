@@ -70,10 +70,14 @@ func (u *User) CheckPassword(pw string) (bool, error) {
 	return u.password.Check(pw)
 }
 
-func (u *User) GetID() id.ID {
+func (u *User) ID() id.ID {
 	return u.id
 }
 
 func (u *User) IsActive() bool {
 	return u.isActive
+}
+
+func (u *User) Role() Role {
+	return u.role
 }

@@ -1,4 +1,4 @@
-package registrations
+package registrar
 
 import (
 	"context"
@@ -8,17 +8,17 @@ import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
 )
 
-type UsersRegistrar struct {
+type Registrar struct {
 	usersStorage users.Storage
 }
 
-func NewUsersRegistrar(usersStorage users.Storage) *UsersRegistrar {
-	return &UsersRegistrar{
+func New(usersStorage users.Storage) *Registrar {
+	return &Registrar{
 		usersStorage: usersStorage,
 	}
 }
 
-func (r *UsersRegistrar) RegisterUser(ctx context.Context, params usecases.RegisterUserParams) error {
+func (r *Registrar) Register(ctx context.Context, params usecases.RegisterParams) error {
 
 	newUserParams := users.NewUserParams{
 		EmailAddress: params.Email,

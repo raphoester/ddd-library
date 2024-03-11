@@ -10,31 +10,32 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (c *Controller) Login(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {
+func (c *Controller) Authenticate(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {
 
-	params, err := mapLoginParams(req)
+	params, err := mapAuthenticateParams(req)
 	if err != nil {
 		return nil, err
 	}
 
-	token, err := c.loginManager.Authenticate(ctx, *params)
+	token, err := c.authenticator.Authenticate(ctx, *params)
 	if err != nil {
 		return nil, err
 	}
 
 	return &proto.LoginResponse{
-		Token:      token.GetAccessToken().String(),
-		Expiration: timestamppb.New(token.GetExpiration().Time()),
+		Token:        token.AccessToken().String(),
+		RefreshToken: token.RefreshToken().String(),
+		Expiration:   timestamppb.New(token.GetExpiration().Time()),
 	}, nil
 }
 
-func mapLoginParams(req *proto.LoginRequest) (*usecases.LoginParams, error) {
+func mapAuthenticateParams(req *proto.LoginRequest) (*usecases.AuthenticateParams, error) {
 	emailAddress, err := users.NewEmailAddress(req.Email)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create email address: %w", err)
+		return nil, fmt.Errorf("invalid email address: %w", err)
 	}
 
-	return &usecases.LoginParams{
+	return &usecases.AuthenticateParams{
 		Email:         emailAddress,
 		PlainPassword: req.Password,
 	}, nil

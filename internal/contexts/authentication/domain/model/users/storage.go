@@ -10,16 +10,16 @@ import (
 
 type Storage interface {
 	Register(ctx context.Context, user *UserDAO) error
-	Find(ctx context.Context, id id.ID) (*UserDAO, error)
-	FindFromEmail(ctx context.Context, email string) (*UserDAO, error)
+	Get(ctx context.Context, id id.ID) (*UserDAO, error)
+	GetFromEmail(ctx context.Context, email string) (*UserDAO, error)
 }
 
 func Register(ctx context.Context, storage Storage, user *User) error {
 	return storage.Register(ctx, user.toDAO())
 }
 
-func Find(ctx context.Context, id id.ID, storage Storage) (*User, error) {
-	userDAO, err := storage.Find(ctx, id)
+func Get(ctx context.Context, storage Storage, id id.ID) (*User, error) {
+	userDAO, err := storage.Get(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user: %w", err)
 	}
@@ -32,8 +32,8 @@ func Find(ctx context.Context, id id.ID, storage Storage) (*User, error) {
 	return user, nil
 }
 
-func FindFromEmail(ctx context.Context, storage Storage, email EmailAddress) (*User, error) {
-	userDAO, err := storage.FindFromEmail(ctx, email.String())
+func GetFromEmail(ctx context.Context, storage Storage, email EmailAddress) (*User, error) {
+	userDAO, err := storage.GetFromEmail(ctx, email.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user: %w", err)
 	}

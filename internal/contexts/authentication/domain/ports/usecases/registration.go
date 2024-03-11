@@ -6,11 +6,11 @@ import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
 )
 
-type RegisterUserParams struct {
+type RegisterParams struct {
 	Email    users.EmailAddress
 	Password users.Password
 }
 
-type UsersRegistrar interface {
-	RegisterUser(ctx context.Context, params RegisterUserParams) error
+type Registrar interface {
+	Register(ctx context.Context, params RegisterParams) error
 }

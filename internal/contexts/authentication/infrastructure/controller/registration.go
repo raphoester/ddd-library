@@ -9,22 +9,22 @@ import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/proto"
 )
 
-func (c *Controller) RegisterUser(ctx context.Context,
-	req *proto.RegisterUserRequest) (*proto.RegisterUserResponse, error) {
+func (c *Controller) Register(ctx context.Context,
+	req *proto.RegisterRequest) (*proto.RegisterResponse, error) {
 
-	params, err := mapRegisterUserParams(req)
+	params, err := mapRegisterParams(req)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := c.usersRegistrar.RegisterUser(ctx, *params); err != nil {
+	if err := c.registrar.Register(ctx, *params); err != nil {
 		return nil, err
 	}
 
-	return &proto.RegisterUserResponse{}, nil
+	return &proto.RegisterResponse{}, nil
 }
 
-func mapRegisterUserParams(req *proto.RegisterUserRequest) (*usecases.RegisterUserParams, error) {
+func mapRegisterParams(req *proto.RegisterRequest) (*usecases.RegisterParams, error) {
 	password, err := users.NewPassword(req.Password)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create password: %w", err)
@@ -35,7 +35,7 @@ func mapRegisterUserParams(req *proto.RegisterUserRequest) (*usecases.RegisterUs
 		return nil, fmt.Errorf("failed to create email address: %w", err)
 	}
 
-	return &usecases.RegisterUserParams{
+	return &usecases.RegisterParams{
 		Email:    email,
 		Password: *password,
 	}, nil

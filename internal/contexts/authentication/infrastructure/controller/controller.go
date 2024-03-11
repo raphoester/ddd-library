@@ -2,19 +2,21 @@ package controller
 
 import (
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/login"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/authenticator"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/proto"
 )
 
 type Controller struct {
 	proto.UnimplementedAuthenticationServer
-	usersRegistrar usecases.UsersRegistrar
-	loginManager   usecases.UsersLoginManager
+
+	registrar      usecases.Registrar
+	authenticator  usecases.Authenticator
+	tokenValidator usecases.TokenValidator
 }
 
-func New(usersRegistrar usecases.UsersRegistrar, loginManager *login.UsersAuthenticator) *Controller {
+func New(usersRegistrar usecases.Registrar, loginManager *authenticator.UsersAuthenticator) *Controller {
 	return &Controller{
-		usersRegistrar: usersRegistrar,
-		loginManager:   loginManager,
+		registrar:     usersRegistrar,
+		authenticator: loginManager,
 	}
 }

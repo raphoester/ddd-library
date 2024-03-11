@@ -6,9 +6,10 @@ import (
 	"github.com/google/wire"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/tokens"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
-	usecases2 "github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/login"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrations"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/authenticator"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrar"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/token_validator"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_tokens_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/controller"
@@ -21,8 +22,9 @@ func getUsersAuthController() *controller.Controller {
 
 			inmemory_users_storage.New,
 			inmemory_tokens_storage.New,
-			registrations.NewUsersRegistrar,
-			login.NewUsersAuthenticator,
+			registrar.New,
+			authenticator.New,
+			token_validator.New,
 
 			// repositories
 			wire.Bind(
@@ -35,15 +37,20 @@ func getUsersAuthController() *controller.Controller {
 				new(*inmemory_users_storage.Repository),
 			),
 
-			// usecases
+			// use cases
 			wire.Bind(
-				new(usecases2.UsersRegistrar),
-				new(*registrations.UsersRegistrar),
+				new(usecases.Registrar),
+				new(*registrar.Registrar),
 			),
 
 			wire.Bind(
-				new(usecases2.UsersLoginManager),
-				new(*login.UsersAuthenticator),
+				new(usecases.Authenticator),
+				new(*authenticator.UsersAuthenticator),
+			),
+
+			wire.Bind(
+				new(usecases.TokenValidator),
+				new(*token_validator.TokenValidator),
 			),
 
 			controller.New,

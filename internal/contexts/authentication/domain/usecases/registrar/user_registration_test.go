@@ -1,4 +1,4 @@
-package registrations_test
+package registrar_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/model/users"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/ports/usecases"
-	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrations"
+	"github.com/raphoester/ddd-library/internal/contexts/authentication/domain/usecases/registrar"
 	"github.com/raphoester/ddd-library/internal/contexts/authentication/infrastructure/adapters/inmemory_users_storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,7 +19,7 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 
 	cases := []struct {
 		name                  string
-		params                usecases.RegisterUserParams
+		params                usecases.RegisterParams
 		setupFunc             func(*inmemory_users_storage.Repository)
 		expectError           bool
 		expectedErrorContains string
@@ -42,7 +42,7 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 				err = users.Register(context.Background(), usersStorage, user)
 				require.NoError(t, err)
 			},
-			params: usecases.RegisterUserParams{
+			params: usecases.RegisterParams{
 				Email:    testEmail,
 				Password: *testPassword,
 			},
@@ -50,7 +50,7 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 			expectedErrorContains: "email address already in use",
 		}, {
 			name: "valid",
-			params: usecases.RegisterUserParams{
+			params: usecases.RegisterParams{
 				Email:    testEmail,
 				Password: *testPassword,
 			},
@@ -66,15 +66,15 @@ func TestUsersRegistrar_RegisterUser(t *testing.T) {
 				if c.setupFunc != nil {
 					c.setupFunc(usersStorage)
 				}
-				registrar := registrations.NewUsersRegistrar(usersStorage)
+				registrar := registrar.New(usersStorage)
 
-				err := registrar.RegisterUser(context.Background(), c.params)
+				err := registrar.Register(context.Background(), c.params)
 				if c.expectError {
 					require.Error(t, err)
 					assert.True(t, strings.Contains(err.Error(), c.expectedErrorContains))
 				} else {
 					require.NoError(t, err)
-					_, err := users.FindFromEmail(context.Background(), usersStorage, c.params.Email)
+					_, err := users.GetFromEmail(context.Background(), usersStorage, c.params.Email)
 					require.NoError(t, err)
 				}
 			},
